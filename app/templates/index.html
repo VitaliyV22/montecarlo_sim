@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Carlo Simulation</title>
+    <!-- You can link external CSS or include styles here -->
+    <style>
+        /* Example inline styles */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monte Carlo Simulation for Options Pricing</h1>
+    <form id="monteCarloForm">
+        <label for="S0">Initial Stock Price (S0):</label>
+        <input type="number" id="S0" name="S0" required><br><br>
+
+        <label for="K">Strike Price (K):</label>
+        <input type="number" id="K" name="K" required><br><br>
+
+        <label for="T">Time to Maturity (T in years):</label>
+        <input type="number" id="T" name="T" required><br><br>
+
+        <label for="r">Risk-free Rate (r):</label>
+        <input type="number" step="0.01" id="r" name="r" required><br><br>
+
+        <label for="sigma">Volatility (sigma):</label>
+        <input type="number" step="0.01" id="sigma" name="sigma" required><br><br>
+
+        <label for="num_simulations">Number of Simulations:</label>
+        <input type="number" id="num_simulations" name="num_simulations" value="10000" required><br><br>
+
+        <button type="submit">Calculate Option Price</button>
+    </form>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        document.getElementById('monteCarloForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = {
+                S0: parseFloat(document.getElementById('S0').value),
+                K: parseFloat(document.getElementById('K').value),
+                T: parseFloat(document.getElementById('T').value),
+                r: parseFloat(document.getElementById('r').value),
+                sigma: parseFloat(document.getElementById('sigma').value),
+                num_simulations: parseInt(document.getElementById('num_simulations').value)
+            };
+
+            try {
+                const response = await fetch('/api/monte-carlo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('HTTP error ' + response.status);
+                }
+
+                const responseData = await response.json();
+                document.getElementById('result').innerHTML = `<p>Option Price: ${responseData.option_price}</p>`;
+            } catch (error) {
+                console.error('Error:', error.message);
+            }
+        });
+    </script>
+</body>
+</html>
